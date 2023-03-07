@@ -5,7 +5,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function App() {
   const [pressVal, setPressVal] = useState(0)
   const [scaleVal, setScaleVal] = useState(2)
-  const [pressBool, setPressBool] = useState(false)
 
   let counter = 0;
   let timerinterval = useRef(null);
