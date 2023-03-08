@@ -62,28 +62,31 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={{width: "55%",
-       justifyContent: "center", 
-       alignItems: "center", 
-       backgroundColor: `rgba(50,110,200,${pressVal})`, 
-       aspectRatio: 1, 
-       overflow: "hidden", 
-       borderRadius: 10000, 
-       transform: `scale(${scaleVal})`,
-       position: "absolute"}}>
+      <Text style = {{color:"white", fontSize: 30, margin: 15, textAlign: "center", position: 'absolute', top: 50}}>Press To Start Recording!</Text>
+      <View style={{ width:"100%", justifyContent: "center", alignItems: "center"}}>
+        <View style={{width: "55%",
+        justifyContent: "center", 
+        alignItems: "center", 
+        backgroundColor: `rgba(50,110,200,${pressVal})`, 
+        aspectRatio: 1, 
+        overflow: "hidden", 
+        borderRadius: 10000, 
+        transform: `scale(${scaleVal})`,
+        position: "absolute"}}>
+        </View>
+        <TouchableOpacity style={{width: "50%", 
+        backgroundColor: "#0F57B3", 
+        aspectRatio: 1, 
+        overflow: "hidden",
+        borderRadius: 1000000,
+        justifyContent: "center",
+        alignItems: "center", shadowOpacity: 0.2, shadowRadius: 30, shadowColor: 'white', elevation: 10}}
+        onPressIn = {(e)=>{pressingDown(e); _fast(); _subscribe();} }
+        onPressOut = {(e)=>{notPressingDown(e); _unsubscribe();}}
+        >
+          <Text style= {{fontSize: 30,color: "white", }}>{x}</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={{width: "50%", 
-      backgroundColor: "#0F57B3", 
-      aspectRatio: 1, 
-      overflow: "hidden",
-      borderRadius: 1000000,
-      justifyContent: "center",
-      alignItems: "center", shadowOpacity: 0.2, shadowRadius: 30, shadowColor: 'white', elevation: 10}}
-      onPressIn = {(e)=>{pressingDown(e); _slow(); _subscribe();} }
-      onPressOut = {(e)=>{notPressingDown(e); _unsubscribe();}}
-      >
-        <Text style= {{fontSize: 30,color: "white", }}>{x}</Text>
-      </TouchableOpacity>
     </View>
   );
 }
