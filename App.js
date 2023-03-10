@@ -1,10 +1,54 @@
+import 'react-native-gesture-handler';
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Button, Image } from "react-native";
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
 import { Gyroscope } from "expo-sensors";
 
-export default function App() {
-  // useState sets a variable that is tracked by React. When a state variable is changed the app rerenders
+const navigation = createStackNavigator();
+
+// External style. This came with the template but I tend not to use it.
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#20232A",
+  },
+
+  logo: {
+    width: 400,
+    height: 400,
+  },
+});
+
+
+function HomeScreen({ navigation }) {
+  return (
+    <View>
+      <Text>
+        SwingTracker
+      </Text>
+      <Text>
+        Golf on the fly
+      </Text>
+      <Image 
+        style={styles.logo}
+        source={require('./assets/logo.png')}  // not sure why the image isn't loading https://docs.expo.dev/guides/assets/
+      />
+      <Button
+        title="Go to Tracker Screen"
+        onPress={() => navigation.navigate('Tracker')}
+      />
+    </View>
+  )
+}
+
+function TrackerScreen({ navigation }) {
+// useState sets a variable that is tracked by React. When a state variable is changed the app rerenders
   // to update a state variable use the set state function, NOT "=" operator as this might cause issues
   // For example to update pressVal write setPressVal(123) instead of pressVal = 123
   // the value in the useState declerations below are the values given at the start of the app
@@ -143,14 +187,13 @@ export default function App() {
   );
 }
 
-// External style. This came with the template but I tend not to use it.
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#20232A",
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <navigation.Navigator>
+        <navigation.Screen name="Home" component={HomeScreen} />
+        <navigation.Screen name="Tracker" component={TrackerScreen} />
+      </navigation.Navigator>
+    </NavigationContainer>
+  );
+}
