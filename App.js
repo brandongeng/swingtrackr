@@ -1,10 +1,18 @@
-import 'react-native-gesture-handler';
+import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Button, Image } from "react-native";
-import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
-import { Gyroscope } from "expo-sensors";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Button,
+  Image,
+} from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { Accelerometer, Gyroscope } from "expo-sensors";
+import HomeScreen from "./screens/home";
 
 const navigation = createStackNavigator();
 
@@ -25,52 +33,47 @@ const styles = StyleSheet.create({
   },
 });
 
-
-function HomeScreen({ navigation }) {
-  return (
-    <View>
-      <Text>
-        SwingTracker
-      </Text>
-      <Text>
-        Golf on the fly
-      </Text>
-      <Image 
-        style={styles.logo}
-        source={require('./assets/logo.png')}  // not sure why the image isn't loading https://docs.expo.dev/guides/assets/
-      />
-      <Button
-        title="Go to Tracker Screen"
-        onPress={() => navigation.navigate('Tracker')}
-      />
-    </View>
-  )
-}
-
 function TrackerScreen({ navigation }) {
-// useState sets a variable that is tracked by React. When a state variable is changed the app rerenders
+  // useState sets a variable that is tracked by React. When a state variable is changed the app rerenders
   // to update a state variable use the set state function, NOT "=" operator as this might cause issues
   // For example to update pressVal write setPressVal(123) instead of pressVal = 123
   // the value in the useState declerations below are the values given at the start of the app
   const [pressVal, setPressVal] = useState(0);
   const [scaleVal, setScaleVal] = useState(2);
+  const [swingData, setSwingData] = useState([]);
   const [{ x, y, z }, setData] = useState({
     x: 0,
     y: 0,
     z: 0,
   });
+  const [{ Ax, Ay, Az }, setAData] = useState({
+    x: 0,
+    y: 0,
+    z: 0,
+  });
   const [subscription, setSubscription] = useState(null);
+  const [asubscription, setASubscription] = useState(null);
 
   // Set how fast the sensors take in data
   const _slow = () => Gyroscope.setUpdateInterval(1000);
-  const _fast = () => Gyroscope.setUpdateInterval(16);
+  const _fast = () => {
+    Gyroscope.setUpdateInterval(16);
+    Accelerometer.setUpdateInterval(16);
+  };
 
   // Start gyroscope listener and get gyroscope data
   const _subscribe = () => {
     setSubscription(
       Gyroscope.addListener((gyroscopeData) => {
-        console.log(gyroscopeData);
+        setSwingData([...swingData, gyroscopeData]);
+        console.log("gyro: ", gyroscopeData);
         setData(gyroscopeData);
+      })
+    );
+    setASubscription(
+      Accelerometer.addListener((accelData) => {
+        console.log("accel: ", accelData);
+        setAData(accelData);
       })
     );
   };
@@ -78,7 +81,10 @@ function TrackerScreen({ navigation }) {
   // End a gyroscope listener
   const _unsubscribe = () => {
     subscription && subscription.remove();
+    asubscription && asubscription.remove();
+    console.log(swingData);
     setSubscription(null);
+    setASubscription(null);
   };
 
   // This section, from counter to not pressing down is just a visual effect when holding the button
@@ -190,7 +196,11 @@ function TrackerScreen({ navigation }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <navigation.Navigator>
+      <navigation.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
         <navigation.Screen name="Home" component={HomeScreen} />
         <navigation.Screen name="Tracker" component={TrackerScreen} />
       </navigation.Navigator>
