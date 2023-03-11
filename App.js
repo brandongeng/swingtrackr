@@ -38,24 +38,24 @@ const styles = StyleSheet.create({
   },
 
   screen: {
-    backgroundColor: '#B2F2BB',
+    backgroundColor: "#B2F2BB",
   },
 
   golf_ball_icon: {
     width: 60,
     height: 60,
-    transform: [{ rotate: '30deg' }]
+    transform: [{ rotate: "30deg" }],
   },
 
   appName: {
-    position: 'relative',
-    fontStyle: 'normal',
+    position: "relative",
+    fontStyle: "normal",
     fontWeight: 700,
     fontSize: 40,
     lineHeight: 48,
-    textAlign: 'center',
+    textAlign: "center",
     paddingTop: 5,
-    color: '#2F9E44'
+    color: "#2F9E44",
   },
 });
 
@@ -72,37 +72,39 @@ function TrackerScreen({ navigation }) {
     y: 0,
     z: 0,
   });
-  const [{ Ax, Ay, Az }, setAData] = useState({
-    x: 0,
-    y: 0,
-    z: 0,
-  });
+  const [ax, setAx] = useState(0);
+  const [ay, setAy] = useState(0);
+  const [az, setAz] = useState(0);
   const [subscription, setSubscription] = useState(null);
   const [asubscription, setASubscription] = useState(null);
 
   // Set how fast the sensors take in data
-  const _slow = () => Gyroscope.setUpdateInterval(1000);
+  const _slow = () => Gyroscope.setUpdateInterval(100);
   const _fast = () => {
-    Gyroscope.setUpdateInterval(16);
-    Accelerometer.setUpdateInterval(16);
+    Gyroscope.setUpdateInterval(100);
+    Accelerometer.setUpdateInterval(100);
   };
 
   // Start gyroscope listener and get gyroscope data
   const _subscribe = () => {
     setSubscription(
       Gyroscope.addListener((gyroscopeData) => {
-        setSwingData([...swingData, gyroscopeData]);
-        console.log("gyro: ", gyroscopeData);
         setData(gyroscopeData);
       })
     );
     setASubscription(
       Accelerometer.addListener((accelData) => {
-        console.log("accel: ", accelData);
-        setAData(accelData);
+        setAx(accelData.x);
+        setAy(accelData.y);
+        setAz(accelData.y);
       })
     );
   };
+
+  useEffect(() => {
+    console.log(ax);
+    setSwingData([...swingData, { x: ax, y: ay, z: az }]);
+  }, [ax]);
 
   // End a gyroscope listener
   const _unsubscribe = () => {
@@ -151,16 +153,19 @@ function TrackerScreen({ navigation }) {
     // Views are essentially divs or containers that store other elements
     // note that this view uses a style defined elsewhere, I usuall use inline styles which you can see everywhere else
     <View style={styles.container}>
-      <View style={{
+      <View
+        style={{
           display: "flex",
           flexDirection: "row",
           marginTop: 80,
-        }}>
-          <Image 
-            style={styles.golf_ball_icon}
-            source={require("./assets/golf-ball.png")}/>
-          <Text style={styles.appName}>SwingTracker</Text>
-        </View>
+        }}
+      >
+        <Image
+          style={styles.golf_ball_icon}
+          source={require("./assets/golf-ball.png")}
+        />
+        <Text style={styles.appName}>SwingTracker</Text>
+      </View>
       <View style={styles.container}>
         {/*Text renders text 🤯*/}
         <Text
@@ -181,6 +186,7 @@ function TrackerScreen({ navigation }) {
             width: "100%",
             justifyContent: "center",
             alignItems: "center",
+            paddingTop: 150,
           }}
         >
           <View
@@ -194,6 +200,7 @@ function TrackerScreen({ navigation }) {
               borderRadius: 10000,
               transform: `scale(${scaleVal})`,
               position: "absolute",
+              top: 140,
             }}
           />
           {/*Touchable opacities are essentially buttons
@@ -217,6 +224,7 @@ function TrackerScreen({ navigation }) {
               elevation: 10,
             }}
             onPressIn={(e) => {
+              setSwingData([]);
               pressingDown(e);
               _fast();
               _subscribe();
@@ -226,62 +234,71 @@ function TrackerScreen({ navigation }) {
               _unsubscribe();
             }}
           >
-            <Text 
-              style={{ fontSize: 30, color: "black" }}>
-                {x}
-            </Text>
+            <Text style={{ fontSize: 30, color: "black" }}>{x}</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{
-        display: "flex",
-        flexDirection: "row",
-        width: "100%",
-        height: "8%",
-        paddingLeft: 30,
-        paddingRight: 30,
-        justifyContent: "space-between",
-        alignItems: "center",
-        backgroundColor: "#D9D9D9",
-      }}>
-        <View style={{
+      <View
+        style={{
           display: "flex",
-          flexDirection: "column"
-        }}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Home")}
-          >
+          flexDirection: "row",
+          width: "100%",
+          height: "8%",
+          paddingLeft: 30,
+          paddingRight: 30,
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: "#D9D9D9",
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
             <Image
               source={require("./assets/home_icon.png")}
-              style={styles.icon}/>
+              style={styles.icon}
+            />
           </TouchableOpacity>
           <Text>Home</Text>
         </View>
-        <View style={{
-          display: "flex",
-          flexDirection: "column"
-        }}>
-          <Image 
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Image
             source={require("./assets/tracker_icon.png")}
-            style={styles.icon}/>
+            style={styles.icon}
+          />
           <Text>Tracker</Text>
         </View>
-        <View style={{
-          display: "flex",
-          flexDirection: "column"
-        }}>
-          <Image 
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Image
             source={require("./assets/pie_chart_icon.png")}
-            style={styles.icon}/>
+            style={styles.icon}
+          />
           <Text>Stats</Text>
         </View>
-        <View style={{
-          display: "flex",
-          flexDirection: "column"
-        }}>
-          <Image 
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Image
             source={require("./assets/profile_icon.png")}
-            style={styles.icon}/>
+            style={styles.icon}
+          />
           <Text>Profile</Text>
         </View>
       </View>
