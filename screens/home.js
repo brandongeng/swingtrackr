@@ -22,23 +22,68 @@ const styles = StyleSheet.create({
     backgroundColor: "#20232A",
   },
 
+  screen: {
+    backgroundColor: '#B2F2BB',
+    position: 'relative',
+    width: 390,
+    height: 844
+  },
+
   logo: {
     width: 400,
     height: 400,
+  },
+
+  golf_ball_icon: {
+    position: 'relative',
+    width: 60,
+    height: 60,
+    transform: [{ rotate: '30deg' }]
+  },
+
+  appName: {
+    position: 'relative',
+    fontStyle: 'normal',
+    fontWeight: 700,
+    fontSize: 40,
+    lineHeight: 48,
+    textAlign: 'center',
+
+    color: '#2F9E44'
+  },
+
+  loginText: {
+    // position: 'absolute',
+    fontStyle: 'normal',
+    fontWeight: 700,
+    fontSize: 20,
+    lineHeight: 24,
+    /* identical to box height */
+
+    textAlign: 'center',
+
+    color: '#000000'
   },
 });
 
 function HomeScreen({ navigation }) {
   return (
-    <View>
-      <Text>SwingTracker</Text>
-      <Text>Golf on the fly</Text>
+    <View style={styles.screen}>
+      <View>
+         {/* NEED TO CENTER THIS*/}
+        <Image 
+          style={styles.golf_ball_icon}
+          source={require("../assets/golf-ball.png")}/>
+        <Text style={styles.appName}>SwingTracker</Text>
+      </View>
+      <Text style={styles.loginText}>Golf on the fly</Text>
       <Image
         style={styles.logo}
-        source={require("../assets/logo.png")} // not sure why the image isn't loading https://docs.expo.dev/guides/assets/
+        source={require("../assets/logo.png")}
       />
       <Button
         title="Go to Tracker Screen"
+        style={styles.loginButton}
         onPress={() => navigation.navigate("Tracker")}
       />
     </View>

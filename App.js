@@ -24,12 +24,40 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#20232A",
+    backgroundColor: "#B2F2BB",
   },
 
   logo: {
     width: 400,
     height: 400,
+  },
+
+  icon: {
+    width: 40,
+    height: 40,
+  },
+
+  screen: {
+    backgroundColor: '#B2F2BB',
+  },
+
+  golf_ball_icon: {
+    width: 60,
+    height: 60,
+    transform: [{ rotate: '30deg' }]
+  },
+
+  appName: {
+    // position: 'absolute',
+    fontStyle: 'normal',
+    fontWeight: 700,
+    fontSize: 40,
+    lineHeight: 48,
+    /* identical to box height */
+
+    textAlign: 'center',
+
+    color: '#2F9E44'
   },
 });
 
@@ -125,69 +153,93 @@ function TrackerScreen({ navigation }) {
     // Views are essentially divs or containers that store other elements
     // note that this view uses a style defined elsewhere, I usuall use inline styles which you can see everywhere else
     <View style={styles.container}>
-      {/*Text renders text 🤯*/}
-      <Text
-        style={{
-          color: "white",
-          fontSize: 30,
-          margin: 15,
-          textAlign: "center",
-          position: "absolute",
-          top: 50,
-        }}
-      >
-        Press To Start Recording!
-      </Text>
-      <View
-        style={{
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View
+      <View style={styles.container}>
+        {/*Text renders text 🤯*/}
+        <Text
           style={{
-            width: "55%",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: `rgba(50,110,200,${pressVal})`,
-            aspectRatio: 1,
-            overflow: "hidden",
-            borderRadius: 10000,
-            transform: `scale(${scaleVal})`,
+            color: "white",
+            fontSize: 30,
+            margin: 15,
+            textAlign: "center",
             position: "absolute",
-          }}
-        />
-        {/*Touchable opacities are essentially buttons
-        onPressIn triggers when you tap the button and starts recording data
-        onPressOut triggers when you leave the finger and stops recording the data
-        */}
-        <TouchableOpacity
-          style={{
-            width: "50%",
-            backgroundColor: "#0F57B3",
-            aspectRatio: 1,
-            overflow: "hidden",
-            borderRadius: 1000000,
-            justifyContent: "center",
-            alignItems: "center",
-            shadowOpacity: 0.2,
-            shadowRadius: 30,
-            shadowColor: "white",
-            elevation: 10,
-          }}
-          onPressIn={(e) => {
-            pressingDown(e);
-            _fast();
-            _subscribe();
-          }}
-          onPressOut={(e) => {
-            notPressingDown(e);
-            _unsubscribe();
+            top: 50,
           }}
         >
-          <Text style={{ fontSize: 30, color: "white" }}>{x}</Text>
-        </TouchableOpacity>
+          Press To Start Recording!
+        </Text>
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: "55%",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: `rgba(50,110,200,${pressVal})`,
+              aspectRatio: 1,
+              overflow: "hidden",
+              borderRadius: 10000,
+              transform: `scale(${scaleVal})`,
+              position: "absolute",
+            }}
+          />
+          {/*Touchable opacities are essentially buttons
+          onPressIn triggers when you tap the button and starts recording data
+          onPressOut triggers when you leave the finger and stops recording the data
+          */}
+          <TouchableOpacity
+            style={{
+              width: "50%",
+              backgroundColor: "#0F57B3",
+              aspectRatio: 1,
+              overflow: "hidden",
+              borderRadius: 1000000,
+              justifyContent: "center",
+              alignItems: "center",
+              shadowOpacity: 0.2,
+              shadowRadius: 30,
+              shadowColor: "white",
+              elevation: 10,
+            }}
+            onPressIn={(e) => {
+              pressingDown(e);
+              _fast();
+              _subscribe();
+            }}
+            onPressOut={(e) => {
+              notPressingDown(e);
+              _unsubscribe();
+            }}
+          >
+            <Text style={{ fontSize: 30, color: "white" }}>{x}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{
+        display: "flex",
+        flexDirection: "row",
+        width: "100%",
+        height: "8%",
+        justifyContent: "left",
+        alignItems: "center",
+        backgroundColor: "#D9D9D9",
+      }}>
+        <Image
+          source={require("./assets/home_icon.png")}
+          style={styles.icon}/>
+        <Image 
+          source={require("./assets/tracker_icon.png")}
+          style={styles.icon}/>
+        <Image 
+          source={require("./assets/pie_chart_icon.png")}
+          style={styles.icon}/>
+        <Image 
+          source={require("./assets/profile_icon.png")}
+          style={styles.icon}/>
       </View>
     </View>
   );
