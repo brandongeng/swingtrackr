@@ -48,15 +48,13 @@ const styles = StyleSheet.create({
   },
 
   appName: {
-    // position: 'absolute',
+    position: 'relative',
     fontStyle: 'normal',
     fontWeight: 700,
     fontSize: 40,
     lineHeight: 48,
-    /* identical to box height */
-
     textAlign: 'center',
-
+    paddingTop: 5,
     color: '#2F9E44'
   },
 });
@@ -153,19 +151,30 @@ function TrackerScreen({ navigation }) {
     // Views are essentially divs or containers that store other elements
     // note that this view uses a style defined elsewhere, I usuall use inline styles which you can see everywhere else
     <View style={styles.container}>
+      <View style={{
+          display: "flex",
+          flexDirection: "row",
+          marginTop: 80,
+        }}>
+          <Image 
+            style={styles.golf_ball_icon}
+            source={require("./assets/golf-ball.png")}/>
+          <Text style={styles.appName}>SwingTracker</Text>
+        </View>
       <View style={styles.container}>
         {/*Text renders text 🤯*/}
         <Text
           style={{
-            color: "white",
-            fontSize: 30,
+            color: "black",
+            fontSize: 40,
             margin: 15,
             textAlign: "center",
             position: "absolute",
-            top: 50,
+            fontWeight: 700,
+            top: 20,
           }}
         >
-          Press To Start Recording!
+          Hold the button below when ready to swing!
         </Text>
         <View
           style={{
@@ -194,7 +203,9 @@ function TrackerScreen({ navigation }) {
           <TouchableOpacity
             style={{
               width: "50%",
-              backgroundColor: "#0F57B3",
+              backgroundColor: "#D9D9D9",
+              borderWidth: 1,
+              border: "#000000",
               aspectRatio: 1,
               overflow: "hidden",
               borderRadius: 1000000,
@@ -215,7 +226,10 @@ function TrackerScreen({ navigation }) {
               _unsubscribe();
             }}
           >
-            <Text style={{ fontSize: 30, color: "white" }}>{x}</Text>
+            <Text 
+              style={{ fontSize: 30, color: "black" }}>
+                {x}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -224,22 +238,52 @@ function TrackerScreen({ navigation }) {
         flexDirection: "row",
         width: "100%",
         height: "8%",
-        justifyContent: "left",
+        paddingLeft: 30,
+        paddingRight: 30,
+        justifyContent: "space-between",
         alignItems: "center",
         backgroundColor: "#D9D9D9",
       }}>
-        <Image
-          source={require("./assets/home_icon.png")}
-          style={styles.icon}/>
-        <Image 
-          source={require("./assets/tracker_icon.png")}
-          style={styles.icon}/>
-        <Image 
-          source={require("./assets/pie_chart_icon.png")}
-          style={styles.icon}/>
-        <Image 
-          source={require("./assets/profile_icon.png")}
-          style={styles.icon}/>
+        <View style={{
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Home")}
+          >
+            <Image
+              source={require("./assets/home_icon.png")}
+              style={styles.icon}/>
+          </TouchableOpacity>
+          <Text>Home</Text>
+        </View>
+        <View style={{
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          <Image 
+            source={require("./assets/tracker_icon.png")}
+            style={styles.icon}/>
+          <Text>Tracker</Text>
+        </View>
+        <View style={{
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          <Image 
+            source={require("./assets/pie_chart_icon.png")}
+            style={styles.icon}/>
+          <Text>Stats</Text>
+        </View>
+        <View style={{
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          <Image 
+            source={require("./assets/profile_icon.png")}
+            style={styles.icon}/>
+          <Text>Profile</Text>
+        </View>
       </View>
     </View>
   );

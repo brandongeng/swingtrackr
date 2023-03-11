@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     lineHeight: 48,
     textAlign: 'center',
-
+    paddingTop: 5,
     color: '#2F9E44'
   },
 
@@ -69,8 +69,12 @@ const styles = StyleSheet.create({
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.screen}>
-      <View>
-         {/* NEED TO CENTER THIS*/}
+      <View style={{
+        display: "flex",
+        flexDirection: "row",
+        marginTop: 80,
+        marginLeft: 30
+      }}>
         <Image 
           style={styles.golf_ball_icon}
           source={require("../assets/golf-ball.png")}/>
