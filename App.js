@@ -26,7 +26,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#B2F2BB",
   },
+  
+  row: {
+    flexDirection: 'row',
+  },
 
+  cell: {
+    flex: 1,
+    aspectRatio: 1,
+    borderWidth: 1,
+    borderColor: 'black',
+    backgroundColor: "#FFFFFF",
+  },
+  
   logo: {
     width: 400,
     height: 400,
@@ -306,6 +318,41 @@ function TrackerScreen({ navigation }) {
   );
 }
 
+function FeedbackScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <View style={styles.row}>
+        <View style={styles.cell} >
+          <Text>Swing Path</Text>
+        </View>
+        <View style={styles.cell} >
+          <Text>Face Angle</Text>
+        </View>
+        <View style={styles.cell} >
+          <Text>Distance</Text>
+        </View>
+        <View style={styles.cell} >
+          <Text>Accuracy</Text>
+        </View>
+      </View>
+      <View style={styles.row}>
+        <View style={styles.cell} >
+          <Text>Attack Angle</Text>
+        </View>
+        <View style={styles.cell} >
+          <Text>Launch Angle</Text>
+        </View>
+        <View style={styles.cell} >
+          <Text>Ball Speed</Text>
+        </View>
+        <View style={styles.cell} >
+          <Text>Clubhead Speed</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -316,6 +363,7 @@ export default function App() {
       >
         <navigation.Screen name="Home" component={HomeScreen} />
         <navigation.Screen name="Tracker" component={TrackerScreen} />
+        <navigation.Screen name="Feedback" component={FeedbackScreen} />
       </navigation.Navigator>
     </NavigationContainer>
   );
