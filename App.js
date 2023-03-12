@@ -13,6 +13,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { Accelerometer, Gyroscope } from "expo-sensors";
 import HomeScreen from "./screens/home";
+import { useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 const navigation = createStackNavigator();
 
@@ -123,6 +125,9 @@ function TrackerScreen({ navigation }) {
     subscription && subscription.remove();
     asubscription && asubscription.remove();
     console.log(swingData);
+    navigation.navigate('Feedback', {
+       paramkey: swingData, 
+    });
     setSubscription(null);
     setASubscription(null);
   };
@@ -158,6 +163,7 @@ function TrackerScreen({ navigation }) {
     timer(false);
     setPressVal(0);
     clearInterval(timerinterval.current);
+    navigation.navigate("Feedback");
   };
 
   // This is what is actually rendered on the app
@@ -319,7 +325,32 @@ function TrackerScreen({ navigation }) {
 }
 
 //added feedback sreen
-function FeedbackScreen({ navigation }) {
+function FeedbackScreen({ route }) {
+  const swingData = route.params.paramkey;
+  const veloData = [];
+  const posData =[];
+  var dt= .1;
+  veloData.push([0,0,0]);
+  posData.push([0,0,0]);
+
+  for(let i=0; i<swingData.length; i++){
+    var Ax = swingData[i].x;
+    var Ay = (swingData[i].y+1);
+    var Az = swingData[i].z;
+    var Vx = veloData[i][0]+(Ax*dt);
+    var Vy = veloData[i][1]+(Ay*dt);
+    var Vz = veloData[i][2]+(Az*dt);
+    veloData.push([Vx,Vy,Vz]);
+    var Px = posData[i][0]+(Vx*dt);
+    var Py = posData[i][1]+(Vy*dt);
+    var Pz = posData[i][2]+(Vz*dt);
+    posData.push([Px,Py,Pz]);
+  }
+
+  console.log(veloData);
+  console.log(posData);
+
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
