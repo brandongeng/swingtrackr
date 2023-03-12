@@ -34,15 +34,15 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 
-  column: {
-    flexDirection: "column",
-    width: "auto",
-    height: "75%",
-  },
+	column: {
+		flexDirection: "column",
+		width: "auto",
+		height: "75%",
+	},
 
 	cell: {
 		flex: 1,
-    alignItems: "center",
+		alignItems: "center",
 		aspectRatio: 1,
 		borderWidth: 1,
 		borderColor: "black",
@@ -120,7 +120,7 @@ function TrackerScreen({ navigation }) {
 			Accelerometer.addListener((accelData) => {
 				setAx(accelData.x);
 				setAy(accelData.y);
-				setAz(accelData.y);
+				setAz(accelData.z);
 			})
 		);
 	};
@@ -281,61 +281,132 @@ function TrackerScreen({ navigation }) {
 
 //added feedback sreen
 function FeedbackScreen({ route, navigation }) {
-	const swingData = route.params.paramkey;
-	const veloData = [];
-	const posData = [];
-	var dt = 0.1;
-	veloData.push([0, 0, 0]);
-	posData.push([0, 0, 0]);
+	const [pData, setPdata] = useState([]);
+	const [showGraph, setShowGraph] = useState(false);
 
-	for (let i = 0; i < swingData.length; i++) {
-		var Ax = swingData[i].x;
-		var Ay = swingData[i].y + 1;
-		var Az = swingData[i].z;
-		var Vx = veloData[i][0] + Ax * dt;
-		var Vy = veloData[i][1] + Ay * dt;
-		var Vz = veloData[i][2] + Az * dt;
-		veloData.push([Vx, Vy, Vz]);
-		var Px = posData[i][0] + Vx * dt;
-		var Py = posData[i][1] + Vy * dt;
-		var Pz = posData[i][2] + Vz * dt;
-		posData.push([Px, Py, Pz]);
-	}
+	const swingData = route.params.paramkey;
+
+	useEffect(() => {
+		const veloData = [];
+		const posData = [];
+		var dt = 0.1;
+		veloData.push([0, 0, 0]);
+		posData.push([0, 0, 0]);
+
+		for (let i = 0; i < swingData.length; i++) {
+			var Ax = swingData[i].x;
+			var Ay = swingData[i].y;
+			var Az = swingData[i].z;
+			var Vx = veloData[i][0] + Ax * dt;
+			var Vy = veloData[i][1] + Ay * dt;
+			var Vz = veloData[i][2] + Az * dt;
+			veloData.push([Vx, Vy, Vz]);
+			var Px = posData[i][0] + Vx * dt;
+			var Py = posData[i][1] + Vy * dt;
+			var Pz = posData[i][2] + Vz * dt;
+			posData.push([Px, Py, Pz]);
+		}
+		let arr1 = [].concat(...posData);
+		let min = Math.min(...arr1);
+		let max = Math.max(...arr1);
+		for (let i = 0; i < posData.length; i++) {
+			posData[i][0] = (posData[i][0] - min) / (max - min);
+			posData[i][1] = (posData[i][1] - min) / (max - min);
+			posData[i][2] = (posData[i][2] - min) / (max - min);
+		}
+		setPdata(posData);
+	}, [swingData]);
+
+	useEffect(() => {
+		console.log(pData);
+	}, [pData]);
 
 	return (
-    <View style={styles.container}>
-      <View style={{flexDirection: "row", width: "100%", height: "92%", alignItems: "center", justifyContent: "center"}}>
-        <View style={styles.column}>
-          <View style={styles.cell}>
-            <Text>Swing Path</Text>
-          </View>
-          <View style={styles.cell}>
-            <Text>Face Angle</Text>
-          </View>
-          <View style={styles.cell}>
-            <Text>Distance</Text>
-          </View>
-          <View style={styles.cell}>
-            <Text>Accuracy</Text>
-          </View>
-        </View>
-        <View style={styles.column}>
-          <View style={styles.cell}>
-            <Text>Attack Angle</Text>
-          </View>
-          <View style={styles.cell}>
-            <Text>Launch Angle</Text>
-          </View>
-          <View style={styles.cell}>
-            <Text>Ball Speed</Text>
-          </View>
-          <View style={styles.cell}>
-            <Text>Clubhead Speed</Text>
-          </View>
-        </View>
-      </View>
-      <Navbar navigation={navigation}></Navbar>
-    </View>
+		<View style={styles.container}>
+			<View
+				style={{
+					flexDirection: "row",
+					width: "100%",
+					height: "80%",
+					alignItems: "center",
+					justifyContent: "center",
+					display: showGraph ? "none" : "flex",
+				}}
+			>
+				<View style={styles.column}>
+					<View style={styles.cell}>
+						<Text>Swing Path</Text>
+					</View>
+					<View style={styles.cell}>
+						<Text>Face Angle</Text>
+					</View>
+					<View style={styles.cell}>
+						<Text>Distance</Text>
+					</View>
+					<View style={styles.cell}>
+						<Text>Accuracy</Text>
+					</View>
+				</View>
+				<View style={styles.column}>
+					<View style={styles.cell}>
+						<Text>Attack Angle</Text>
+					</View>
+					<View style={styles.cell}>
+						<Text>Launch Angle</Text>
+					</View>
+					<View style={styles.cell}>
+						<Text>Ball Speed</Text>
+					</View>
+					<View style={styles.cell}>
+						<Text>Clubhead Speed</Text>
+					</View>
+				</View>
+			</View>
+			<View
+				style={{
+					height: "80%",
+					width: "100%",
+					display: showGraph ? "flex" : "none",
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<View
+					style={{
+						height: "50%",
+						width: "90%",
+						borderWidth: 1,
+						position: "relative",
+					}}
+				>
+					{pData.map(function (x) {
+						console.log(x);
+						return (
+							<View
+								style={{
+									position: "absolute",
+									width: 10,
+									height: 10,
+									backgroundColor: "blue",
+									borderRadius: 10000,
+									left: `${x[0] * 95}%`,
+									bottom: `${x[1] * 95}%`,
+								}}
+							></View>
+						);
+					})}
+				</View>
+			</View>
+			<TouchableOpacity
+				style={{ height: "12%" }}
+				onPress={() => {
+					setShowGraph(!showGraph);
+				}}
+			>
+				<Text>Show Graph</Text>
+			</TouchableOpacity>
+			<Navbar navigation={navigation}></Navbar>
+		</View>
 	);
 }
 
