@@ -13,6 +13,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { Accelerometer, Gyroscope } from "expo-sensors";
 import HomeScreen from "./screens/home";
+import Navbar from "./navbar";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 
@@ -35,12 +36,13 @@ const styles = StyleSheet.create({
 
   column: {
     flexDirection: "column",
-    width: "40%",
+    width: "auto",
     height: "75%",
   },
 
 	cell: {
 		flex: 1,
+    alignItems: "center",
 		aspectRatio: 1,
 		borderWidth: 1,
 		borderColor: "black",
@@ -272,78 +274,13 @@ function TrackerScreen({ navigation }) {
 					</TouchableOpacity>
 				</View>
 			</View>
-			<View
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					width: "100%",
-					height: "8%",
-					paddingLeft: 30,
-					paddingRight: 30,
-					justifyContent: "space-between",
-					alignItems: "center",
-					backgroundColor: "#D9D9D9",
-				}}
-			>
-				<View
-					style={{
-						display: "flex",
-						flexDirection: "column",
-					}}
-				>
-					<TouchableOpacity
-						onPress={() => navigation.navigate("Home")}
-					>
-						<Image
-							source={require("./assets/home_icon.png")}
-							style={styles.icon}
-						/>
-					</TouchableOpacity>
-					<Text>Home</Text>
-				</View>
-				<View
-					style={{
-						display: "flex",
-						flexDirection: "column",
-					}}
-				>
-					<Image
-						source={require("./assets/tracker_icon.png")}
-						style={styles.icon}
-					/>
-					<Text>Tracker</Text>
-				</View>
-				<View
-					style={{
-						display: "flex",
-						flexDirection: "column",
-					}}
-				>
-					<Image
-						source={require("./assets/pie_chart_icon.png")}
-						style={styles.icon}
-					/>
-					<Text>Stats</Text>
-				</View>
-				<View
-					style={{
-						display: "flex",
-						flexDirection: "column",
-					}}
-				>
-					<Image
-						source={require("./assets/profile_icon.png")}
-						style={styles.icon}
-					/>
-					<Text>Profile</Text>
-				</View>
-			</View>
+			<Navbar navigation={navigation}></Navbar>
 		</View>
 	);
 }
 
 //added feedback sreen
-function FeedbackScreen({ route }) {
+function FeedbackScreen({ route, navigation }) {
 	const swingData = route.params.paramkey;
 	const veloData = [];
 	const posData = [];
@@ -367,36 +304,37 @@ function FeedbackScreen({ route }) {
 
 	return (
     <View style={styles.container}>
-      <View style={{flexDirection: "row", width: "100%", height: "100%", alignItems: "center", justifyContent: "center"}}>
-      <View style={styles.column}>
-        <View style={styles.cell}>
-          <Text>Swing Path</Text>
+      <View style={{flexDirection: "row", width: "100%", height: "92%", alignItems: "center", justifyContent: "center"}}>
+        <View style={styles.column}>
+          <View style={styles.cell}>
+            <Text>Swing Path</Text>
+          </View>
+          <View style={styles.cell}>
+            <Text>Face Angle</Text>
+          </View>
+          <View style={styles.cell}>
+            <Text>Distance</Text>
+          </View>
+          <View style={styles.cell}>
+            <Text>Accuracy</Text>
+          </View>
         </View>
-        <View style={styles.cell}>
-          <Text>Face Angle</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text>Distance</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text>Accuracy</Text>
+        <View style={styles.column}>
+          <View style={styles.cell}>
+            <Text>Attack Angle</Text>
+          </View>
+          <View style={styles.cell}>
+            <Text>Launch Angle</Text>
+          </View>
+          <View style={styles.cell}>
+            <Text>Ball Speed</Text>
+          </View>
+          <View style={styles.cell}>
+            <Text>Clubhead Speed</Text>
+          </View>
         </View>
       </View>
-      <View style={styles.column}>
-        <View style={styles.cell}>
-          <Text>Attack Angle</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text>Launch Angle</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text>Ball Speed</Text>
-        </View>
-        <View style={styles.cell}>
-          <Text>Clubhead Speed</Text>
-        </View>
-      </View>
-    </View>
+      <Navbar navigation={navigation}></Navbar>
     </View>
 	);
 }
