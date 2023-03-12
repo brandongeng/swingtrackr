@@ -33,6 +33,12 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 
+  column: {
+    flexDirection: "column",
+    width: "40%",
+    height: "75%",
+  },
+
 	cell: {
 		flex: 1,
 		aspectRatio: 1,
@@ -360,36 +366,38 @@ function FeedbackScreen({ route }) {
 	}
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.row}>
-				<View style={styles.cell}>
-					<Text>Swing Path</Text>
-				</View>
-				<View style={styles.cell}>
-					<Text>Face Angle</Text>
-				</View>
-				<View style={styles.cell}>
-					<Text>Distance</Text>
-				</View>
-				<View style={styles.cell}>
-					<Text>Accuracy</Text>
-				</View>
-			</View>
-			<View style={styles.row}>
-				<View style={styles.cell}>
-					<Text>Attack Angle</Text>
-				</View>
-				<View style={styles.cell}>
-					<Text>Launch Angle</Text>
-				</View>
-				<View style={styles.cell}>
-					<Text>Ball Speed</Text>
-				</View>
-				<View style={styles.cell}>
-					<Text>Clubhead Speed</Text>
-				</View>
-			</View>
-		</View>
+    <View style={styles.container}>
+      <View style={{flexDirection: "row", width: "100%", height: "100%", alignItems: "center", justifyContent: "center"}}>
+      <View style={styles.column}>
+        <View style={styles.cell}>
+          <Text>Swing Path</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>Face Angle</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>Distance</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>Accuracy</Text>
+        </View>
+      </View>
+      <View style={styles.column}>
+        <View style={styles.cell}>
+          <Text>Attack Angle</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>Launch Angle</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>Ball Speed</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text>Clubhead Speed</Text>
+        </View>
+      </View>
+    </View>
+    </View>
 	);
 }
 
