@@ -516,7 +516,7 @@ function FeedbackScreen({ route, navigation }) {
         style={{
           height: "7%",
           backgroundColor: "#57475C",
-          marginBottom: "5%",
+          marginBottom: "10%",
           width: "60%",
           justifyContent: "center",
           alignItems: "center",
