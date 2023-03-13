@@ -37,16 +37,19 @@ const styles = StyleSheet.create({
   column: {
     flexDirection: "column",
     width: "auto",
-    height: "75%",
+    height: "90%",
   },
 
   cell: {
     flex: 1,
     alignItems: "center",
+    borderRadius: 20,
     aspectRatio: 1,
-    borderWidth: 1,
-    borderColor: "black",
-    backgroundColor: "#FFFFFF",
+    borderWidth: 10,
+    borderColor: "#1e1e1e",
+    backgroundColor: "#575757",
+    color: "white",
+    position: "relative",
   },
 
   logo: {
@@ -287,6 +290,20 @@ function TrackerScreen({ navigation }) {
 function FeedbackScreen({ route, navigation }) {
   const [pData, setPdata] = useState([]);
   const [showGraph, setShowGraph] = useState(false);
+  const [feedbackData, setFeedbackData] = useState(["", 0, 0, 0, 0, 0, 0, 0]);
+
+  useEffect(() => {
+    let temp = [...feedbackData];
+    temp[0] = ["Good", "Decent", "Needs Work"][Math.floor(Math.random() * 2)];
+    temp[1] = Math.floor(Math.random() * 4) + 5;
+    temp[2] = Math.floor(Math.random() * 50) + 125;
+    temp[3] = Math.floor(Math.random() * 20) + 70;
+    temp[4] = Math.floor(Math.random() * 3) - 5;
+    temp[5] = Math.floor(Math.random() * 5) + 14;
+    temp[6] = Math.floor(Math.random() * 30) + 90;
+    temp[7] = Math.floor(Math.random() * 20) + 80;
+    setFeedbackData(temp);
+  }, []);
 
   const swingData = route.params.paramkey;
 
@@ -335,30 +352,128 @@ function FeedbackScreen({ route, navigation }) {
       >
         <View style={styles.column}>
           <View style={styles.cell}>
-            <Text>Swing Path</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Swing Path
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                bottom: "30%",
+                color: "white",
+                fontSize: 24,
+                margin: 0,
+                padding: 0,
+              }}
+            >
+              {feedbackData[0]}
+            </Text>
           </View>
           <View style={styles.cell}>
-            <Text>Face Angle</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Face Angle
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "25%",
+                color: "white",
+                fontSize: 48,
+              }}
+            >
+              {feedbackData[1]}&deg;
+            </Text>
           </View>
           <View style={styles.cell}>
-            <Text>Distance</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Distance
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "25%",
+                color: "white",
+                fontSize: 48,
+              }}
+            >
+              {feedbackData[2]}'
+            </Text>
           </View>
           <View style={styles.cell}>
-            <Text>Accuracy</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Accuracy
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "25%",
+                color: "white",
+                fontSize: 48,
+              }}
+            >
+              {feedbackData[3]}%
+            </Text>
           </View>
         </View>
         <View style={styles.column}>
           <View style={styles.cell}>
-            <Text>Attack Angle</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Attack Angle
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "25%",
+                color: "white",
+                fontSize: 48,
+              }}
+            >
+              {feedbackData[4]}&deg;
+            </Text>
           </View>
           <View style={styles.cell}>
-            <Text>Launch Angle</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Launch Angle
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "25%",
+                color: "white",
+                fontSize: 48,
+              }}
+            >
+              {feedbackData[5]}&deg;
+            </Text>
           </View>
           <View style={styles.cell}>
-            <Text>Ball Speed</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Ball Speed
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "40%",
+                color: "white",
+                fontSize: 24,
+              }}
+            >
+              {feedbackData[6]} mph
+            </Text>
           </View>
           <View style={styles.cell}>
-            <Text>Clubhead Speed</Text>
+            <Text style={{ color: "white", marginTop: 2, fontWeight: "bold" }}>
+              Clubhead Speed
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                top: "40%",
+                color: "white",
+                fontSize: 24,
+              }}
+            >
+              {feedbackData[7]} mph
+            </Text>
           </View>
         </View>
       </View>
@@ -376,6 +491,7 @@ function FeedbackScreen({ route, navigation }) {
             height: "50%",
             width: "90%",
             borderWidth: 1,
+            borderColor: "white",
             position: "relative",
           }}
         >
@@ -397,12 +513,23 @@ function FeedbackScreen({ route, navigation }) {
         </View>
       </View>
       <TouchableOpacity
-        style={{ height: "12%" }}
+        style={{
+          height: "7%",
+          backgroundColor: "#57475C",
+          marginBottom: "5%",
+          width: "60%",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "white",
+          borderRadius: 1000000000,
+        }}
         onPress={() => {
           setShowGraph(!showGraph);
         }}
       >
-        <Text>Show Graph</Text>
+        <Text style={{ color: "white", fontSize: 24 }}>
+          {showGraph ? "Show Results" : "Show Graph"}
+        </Text>
       </TouchableOpacity>
       <Navbar navigation={navigation}></Navbar>
     </View>
