@@ -143,7 +143,7 @@ function TrackerScreen({ navigation }) {
   }, [ax]);
 
   useEffect(() => {
-    setSwingDataG([...swingData, { x: x, y: y, z: z }]);
+    setSwingDataG([...swingDataG, { x: x, y: y, z: z }]);
   }, [x]);
 
   // End a gyroscope listener
@@ -151,7 +151,7 @@ function TrackerScreen({ navigation }) {
     subscription && subscription.remove();
     asubscription && asubscription.remove();
     navigation.navigate("Feedback", {
-      paramkey: swingData,
+      paramkey: {sdata: swingData, sdatag: swingDataG}
     });
     setSubscription(null);
     setASubscription(null);
@@ -294,18 +294,19 @@ function FeedbackScreen({ route, navigation }) {
 
   useEffect(() => {
     let temp = [...feedbackData];
-    temp[0] = ["Good", "Decent", "Needs Work"][Math.floor(Math.random() * 2)];
-    temp[1] = Math.floor(Math.random() * 4) + 5;
-    temp[2] = Math.floor(Math.random() * 50) + 125;
-    temp[3] = Math.floor(Math.random() * 20) + 70;
+    temp[0] = 5-Math.floor(Math.random() * 10);
+    temp[1] = 5-Math.floor(Math.random() * 9) ;
+    temp[2] = 100+Math.floor(Math.random() * 50);
+    temp[3] = Math.floor(Math.random() * 40);
     temp[4] = Math.floor(Math.random() * 3) - 5;
     temp[5] = Math.floor(Math.random() * 5) + 14;
-    temp[6] = Math.floor(Math.random() * 30) + 90;
-    temp[7] = Math.floor(Math.random() * 20) + 80;
+    temp[6] = Math.floor(Math.random() * 30) + 60;
+    temp[7] = 1.5*temp[6];
     setFeedbackData(temp);
   }, []);
 
-  const swingData = route.params.paramkey;
+  const swingData = route.params.paramkey.sdata;
+	const swingDataG = route.params.paramkey.sdatag;
 
   useEffect(() => {
     const veloData = [];
@@ -358,14 +359,12 @@ function FeedbackScreen({ route, navigation }) {
             <Text
               style={{
                 position: "absolute",
-                bottom: "30%",
+                top: "25%",
                 color: "white",
-                fontSize: 24,
-                margin: 0,
-                padding: 0,
+                fontSize: 48,
               }}
             >
-              {feedbackData[0]}
+              {feedbackData[0]}&deg;
             </Text>
           </View>
           <View style={styles.cell}>
@@ -390,12 +389,12 @@ function FeedbackScreen({ route, navigation }) {
             <Text
               style={{
                 position: "absolute",
-                top: "25%",
+                top: "40%",
                 color: "white",
-                fontSize: 48,
+                fontSize: 24,
               }}
             >
-              {feedbackData[2]}'
+              {feedbackData[2]} yds
             </Text>
           </View>
           <View style={styles.cell}>
@@ -405,12 +404,12 @@ function FeedbackScreen({ route, navigation }) {
             <Text
               style={{
                 position: "absolute",
-                top: "25%",
+                top: "40%",
                 color: "white",
-                fontSize: 48,
+                fontSize: 24,
               }}
             >
-              {feedbackData[3]}%
+              {feedbackData[3]} ft
             </Text>
           </View>
         </View>
@@ -551,3 +550,4 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
