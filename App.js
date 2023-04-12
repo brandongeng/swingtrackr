@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { Accelerometer, Gyroscope } from "expo-sensors";
+import { Accelerometer, Gyroscope, Magnetometer } from "expo-sensors";
 import HomeScreen from "./screens/home";
 import Navbar from "./navbar";
 import { useNavigation } from "@react-navigation/native";
@@ -91,19 +91,143 @@ function TrackerScreen({ navigation }) {
   // the value in the useState declerations below are the values given at the start of the app
   const [pressVal, setPressVal] = useState(0);
   const [scaleVal, setScaleVal] = useState(2);
-  const [swingData, setSwingData] = useState([]);
-  const [swingDataG, setSwingDataG] = useState([]);
 
-  const [{ x, y, z }, setData] = useState({
-    x: 0,
-    y: 0,
-    z: 0,
-  });
-  const [ax, setAx] = useState(0);
-  const [ay, setAy] = useState(0);
-  const [az, setAz] = useState(0);
+  const [gyroscopeData, setGyroscopeData] = useState({});
+  const [accelerometerData, setAccelerometerData] = useState({});
+  const [magnetometerData, setMagnetometerData] = useState({});
+  const [orientation, setOrientation] = useState({ x: 0, y: 0, z: 0 });
   const [subscription, setSubscription] = useState(null);
-  const [asubscription, setASubscription] = useState(null);
+
+  useEffect(() => {
+    Accelerometer.setUpdateInterval(16);
+    Gyroscope.setUpdateInterval(16);
+    Magnetometer.setUpdateInterval(16);
+    return () => {
+      _unsubscribe();
+    };
+  }, []);
+
+  const _subscribe = () => {
+    setSubscription(true);
+    console.log("HELLO");
+    Gyroscope.addListener((gyroscopeData) => {
+      setGyroscopeData(gyroscopeData);
+    });
+
+    Accelerometer.addListener((accelerometerData) => {
+      setAccelerometerData(accelerometerData);
+    });
+
+    Magnetometer.addListener((magnetometerData) => {
+      setMagnetometerData(magnetometerData);
+    });
+  };
+
+  const _unsubscribe = () => {
+    setSubscription(false);
+    Gyroscope.removeAllListeners();
+    Accelerometer.removeAllListeners();
+    Magnetometer.removeAllListeners();
+  };
+
+  useEffect(() => {
+    const { x: gx, y: gy, z: gz } = gyroscopeData;
+    const { x: ax, y: ay, z: az } = accelerometerData;
+    const { x: mx, y: my, z: mz } = magnetometerData;
+    if (gx && gy && gz && ax && ay && az && mx && my && mz) {
+      const orientation = calculateOrientation(
+        ax,
+        ay,
+        az,
+        gx,
+        gy,
+        gz,
+        mx,
+        my,
+        mz
+      );
+
+      setOrientation(orientation);
+      //console.log(orientation);
+    }
+  }, [gyroscopeData, accelerometerData, magnetometerData]);
+
+  const calculateOrientation = (ax, ay, az, gx, gy, gz, mx, my, mz) => {
+    const pitch = Math.atan2(ax, Math.sqrt(ay * ay + az * az));
+    const roll = Math.atan2(ay, Math.sqrt(ax * ax + az * az));
+    let heading = Math.atan2(-my, mx);
+    const declination = 0.22; // declination at my location
+    heading += declination;
+
+    let x = gx * 0.1 + orientation.x;
+    let y = gy * 0.1 + orientation.y;
+    let z = gz * 0.1 + orientation.z;
+
+    const norm = Math.sqrt(x * x + y * y + z * z);
+    x /= norm;
+    y /= norm;
+    z /= norm;
+
+    const quaternion = calculateQuaternion(pitch, roll, heading);
+    const rotated = rotateVector(
+      x,
+      y,
+      z,
+      quaternion[0],
+      quaternion[1],
+      quaternion[2],
+      quaternion[3]
+    );
+
+    return {
+      x: rotated[0],
+      y: rotated[1],
+      z: rotated[2],
+    };
+  };
+
+  const calculateQuaternion = (pitch, roll, heading) => {
+    const cy = Math.cos(heading * 0.5);
+    const sy = Math.sin(heading * 0.5);
+    const cp = Math.cos(pitch * 0.5);
+    const sp = Math.sin(pitch * 0.5);
+    const cr = Math.cos(roll * 0.5);
+    const sr = Math.sin(roll * 0.5);
+
+    const qw = cy * cp * cr + sy * sp * sr;
+    const qx = cy * cp * sr - sy * sp * cr;
+    const qy = sy * cp * sr + cy * sp * cr;
+    const qz = sy * cp * cr - cy * sp * sr;
+
+    return [qw, qx, qy, qz];
+  };
+
+  const rotateVector = (x, y, z, qw, qx, qy, qz) => {
+    // Create a quaternion from the vector
+    const vq = [0, x, y, z];
+
+    // Calculate the conjugate of the quaternion
+    const cq = [qw, -qx, -qy, -qz];
+
+    // Multiply the quaternion and the vector
+    const vqRotated = multiplyQuaternions(
+      multiplyQuaternions([qw, qx, qy, qz], vq),
+      cq
+    );
+
+    // Extract the x, y, and z components of the rotated vector
+    const [_, xRotated, yRotated, zRotated] = vqRotated;
+
+    return [xRotated, yRotated, zRotated];
+  };
+
+  // Helper function to multiply two quaternions
+  const multiplyQuaternions = ([w1, x1, y1, z1], [w2, x2, y2, z2]) => [
+    w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+    w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+    w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+    w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+  ];
 
   const imageStyle = StyleSheet.create({
     image: {
@@ -114,48 +238,6 @@ function TrackerScreen({ navigation }) {
       opacity: pressVal,
     },
   });
-
-  // Set how fast the sensors take in data
-  const _slow = () => Gyroscope.setUpdateInterval(100);
-  const _fast = () => {
-    Gyroscope.setUpdateInterval(100);
-    Accelerometer.setUpdateInterval(100);
-  };
-
-  // Start gyroscope listener and get gyroscope data
-  const _subscribe = () => {
-    setSubscription(
-      Gyroscope.addListener((gyroscopeData) => {
-        setData(gyroscopeData);
-      })
-    );
-    setASubscription(
-      Accelerometer.addListener((accelData) => {
-        setAx(accelData.x);
-        setAy(accelData.y);
-        setAz(accelData.z);
-      })
-    );
-  };
-
-  useEffect(() => {
-    setSwingData([...swingData, { x: ax, y: ay, z: az }]);
-  }, [ax]);
-
-  useEffect(() => {
-    setSwingDataG([...swingData, { x: x, y: y, z: z }]);
-  }, [x]);
-
-  // End a gyroscope listener
-  const _unsubscribe = () => {
-    subscription && subscription.remove();
-    asubscription && asubscription.remove();
-    navigation.navigate("Feedback", {
-      paramkey: swingData,
-    });
-    setSubscription(null);
-    setASubscription(null);
-  };
 
   // This section, from counter to not pressing down is just a visual effect when holding the button
   let counter = 0;
@@ -267,9 +349,7 @@ function TrackerScreen({ navigation }) {
               color: "white",
             }}
             onPressIn={(e) => {
-              setSwingData([]);
               pressingDown(e);
-              _fast();
               _subscribe();
             }}
             onPressOut={(e) => {
@@ -288,7 +368,6 @@ function TrackerScreen({ navigation }) {
 
 //added feedback sreen
 function FeedbackScreen({ route, navigation }) {
-  const [pData, setPdata] = useState([]);
   const [showGraph, setShowGraph] = useState(false);
   const [feedbackData, setFeedbackData] = useState(["", 0, 0, 0, 0, 0, 0, 0]);
 
@@ -304,39 +383,6 @@ function FeedbackScreen({ route, navigation }) {
     temp[7] = Math.floor(Math.random() * 20) + 80;
     setFeedbackData(temp);
   }, []);
-
-  const swingData = route.params.paramkey;
-
-  useEffect(() => {
-    const veloData = [];
-    const posData = [];
-    var dt = 0.1;
-    veloData.push([0, 0, 0]);
-    posData.push([0, 0, 0]);
-
-    for (let i = 0; i < swingData.length; i++) {
-      var Ax = swingData[i].x;
-      var Ay = swingData[i].y;
-      var Az = swingData[i].z;
-      var Vx = veloData[i][0] + Ax * dt;
-      var Vy = veloData[i][1] + Ay * dt;
-      var Vz = veloData[i][2] + Az * dt;
-      veloData.push([Vx, Vy, Vz]);
-      var Px = posData[i][0] + Vx * dt;
-      var Py = posData[i][1] + Vy * dt;
-      var Pz = posData[i][2] + Vz * dt;
-      posData.push([Px, Py, Pz]);
-    }
-    let arr1 = [].concat(...posData);
-    let min = Math.min(...arr1);
-    let max = Math.max(...arr1);
-    for (let i = 0; i < posData.length; i++) {
-      posData[i][0] = (posData[i][0] - min) / (max - min);
-      posData[i][1] = (posData[i][1] - min) / (max - min);
-      posData[i][2] = (posData[i][2] - min) / (max - min);
-    }
-    setPdata(posData);
-  }, [swingData]);
 
   return (
     <View style={styles.container}>
@@ -495,7 +541,7 @@ function FeedbackScreen({ route, navigation }) {
             position: "relative",
           }}
         >
-          {pData.map(function (x) {
+          {[[1, 2]].map(function (x) {
             return (
               <View
                 style={{
