@@ -14,8 +14,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Accelerometer, Gyroscope } from "expo-sensors";
 import HomeScreen from "./screens/home";
 import Navbar from "./navbar";
+import { ExpoWebGLRenderingContext, GLView } from 'expo-gl';
+import ExpoTHREE, { THREE, Renderer } from 'expo-three'
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
+
+global.THREE = global.THREE || THREE;
 
 const navigation = createStackNavigator();
 
@@ -339,9 +343,127 @@ function FeedbackScreen({ route, navigation }) {
     setPdata(posData);
   }, [swingData]);
 
+  // const onContextCreate = async (gl) => {
+  //   console.log(gl)
+  //   const scene = new THREE.Scene();
+  //   console.log(scene)
+  //   const camera = new PerspectiveCamera(
+  //     75,
+  //     gl.drawingBufferWidth/gl.drawingBufferHeight,
+  //     0.1,
+  //     1000
+  //   )
+
+  //   gl.canvas = { width: gl.drawingBufferWidth, height: gl.drawingBufferHeight }
+  //   camera.position.z = 2
+
+  //   const renderer = new Renderer({gl})
+  //   renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight)
+
+  //   const geometry = new BoxGeometry(1, 1, 1)
+  //   const material = new MeshBasicMaterial({
+  //     color: 'blue'
+  //   })
+
+  //   const cube = new Mesh(geometry, material)
+  //   scene.add(cube)
+
+  //   const render = ()=> {
+  //     requestAnimationFrame(render)
+  //     cube.rotation.x += 0.01
+  //     cube.rotation.y += 0.01
+  //     renderer.render(scene, camera)
+  //     gl.endFrameEXP()
+  //   }
+
+  //   render()
+  // };
+  const onContextCreateAsync = (gl) => {
+    console.log(gl)
+    // Create a WebGLRenderer without a DOM element
+    const renderer = new Renderer({ gl });
+    renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
+    const sceneColor = 0x1e1e1e;
+    renderer.setClearColor(sceneColor);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(sceneColor, 1, 10000);
+    scene.add(new THREE.GridHelper(10, 10, 0xfff));
+
+    // Define the points of the line
+    const points = []
+    let x_min = 1000
+    let x_max = -1000
+    let y_min = 1000
+    let y_max = -1000
+    let z_min = 1000
+    let z_max = -1000
+    let lowest_y_ind = 0
+
+    for (let i = 0; i < pData.length; i++) {
+      x_min = (pData[i][0] < x_min) ? pData[i][0] : x_min
+      x_max = (pData[i][0] > x_max) ? pData[i][0] : x_max
+      if (pData[i][1] < y_min) {
+        y_min = pData[i][1]
+        lowest_y_ind = i
+      }
+      y_max = (pData[i][1] > y_max) ? pData[i][1] : y_max
+      z_min = (pData[i][2] < z_min) ? pData[i][2] : z_min
+      z_max = (pData[i][2] > z_max) ? pData[i][2] : z_max
+      points.push(new THREE.Vector3(pData[i][0], pData[i][1], pData[i][2]))
+    }
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+    z_range = z_max - z_min
+
+    for (let i = 0; i < pData.length; i++) {
+      pData[i][0] = ((pData[i][0] - x_min) / x_range)
+      pData[i][1] = ((pData[i][1] - y_min) / y_range)
+      pData[i][2] = ((pData[i][2] - z_min) / z_range)
+    }
+
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      gl.drawingBufferWidth / gl.drawingBufferHeight,
+      0.1,
+      1000
+    );
+    console.log(pData)
+    camera.position.set(0, 2, 10);
+    //camera.lookAt(pData[0][0], 5, pData[0][2]);
+
+    // points.push(new THREE.Vector3(x_vector))
+    // points.push(new THREE.Vector3(y_vector))
+    // points.push(new THREE.Vector3(z_vector))
+    // const points = [
+    //   new THREE.Vector3(x_vector),
+    //   new THREE.Vector3(y_vector),
+    //   new THREE.Vector3(z_vector)
+    // ];
+    //console.log(points)
+
+    // Create a geometry object from the points
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    // Create a material for the line
+    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+    // Create the line object and add it to the scene
+    const line = new THREE.Line(geometry, material);
+    scene.add(line);
+
+    // Render the scene
+    const render = () => {
+      renderer.render(scene, camera);
+      gl.endFrameEXP();
+      requestAnimationFrame(render);
+    };
+    requestAnimationFrame(render);
+  }
+
   return (
     <View style={styles.container}>
-      <View
+      {/* <View
         style={{
           flexDirection: "row",
           width: "100%",
@@ -475,41 +597,19 @@ function FeedbackScreen({ route, navigation }) {
             </Text>
           </View>
         </View>
-      </View>
+      </View> */}
       <View
         style={{
           height: "80%",
           width: "100%",
-          display: showGraph ? "flex" : "none",
-          justifyContent: "center",
-          alignItems: "center",
         }}
       >
-        <View
+        <GLView
           style={{
-            height: "50%",
-            width: "90%",
-            borderWidth: 1,
-            borderColor: "white",
-            position: "relative",
+            flex: 1,
           }}
-        >
-          {pData.map(function (x) {
-            return (
-              <View
-                style={{
-                  position: "absolute",
-                  width: 10,
-                  height: 10,
-                  backgroundColor: "blue",
-                  borderRadius: 10000,
-                  left: `${x[0] * 95}%`,
-                  bottom: `${x[1] * 95}%`,
-                }}
-              ></View>
-            );
-          })}
-        </View>
+          onContextCreate={onContextCreateAsync}
+        />
       </View>
       <TouchableOpacity
         style={{
