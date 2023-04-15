@@ -416,11 +416,12 @@ function FeedbackScreen({ route, navigation }) {
     y_range = y_max - y_min
     z_range = z_max - z_min
 
-    for (let i = 0; i < pData.length; i++) {
-      pData[i][0] = ((pData[i][0] - x_min) / x_range)
-      pData[i][1] = ((pData[i][1] - y_min) / y_range)
-      pData[i][2] = ((pData[i][2] - z_min) / z_range)
+    for (let i = 0; i < points.length; i++) {
+      points[i][0] = ((pData[i][0] - x_min) / x_range) 
+      points[i][1] = ((pData[i][1] - y_min) / y_range) 
+      points[i][2] = ((pData[i][2] - z_min) / z_range)
     }
+    console.log(points)
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -428,29 +429,71 @@ function FeedbackScreen({ route, navigation }) {
       0.1,
       1000
     );
-    console.log(pData)
-    camera.position.set(0, 2, 10);
-    //camera.lookAt(pData[0][0], 5, pData[0][2]);
 
-    // points.push(new THREE.Vector3(x_vector))
-    // points.push(new THREE.Vector3(y_vector))
-    // points.push(new THREE.Vector3(z_vector))
-    // const points = [
-    //   new THREE.Vector3(x_vector),
-    //   new THREE.Vector3(y_vector),
-    //   new THREE.Vector3(z_vector)
-    // ];
-    //console.log(points)
+    // Create a 2D plane
+    const plane2d = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+
+    // Project the line onto the plane
+    const projection2d = [];
+    //const scaleFactorY = 2 / y_max
+    const scaleFactorZ = 5 / z_max
+    for (let i = 0; i < points.length; i++) {
+      const projection = new THREE.Vector3();
+      plane2d.projectPoint(points[i], projection); 
+      // The projection is a 3D point, so we need to convert it to 2D
+      const projectionLine = new THREE.Vector3(0, projection.y, projection.z * scaleFactorZ);
+      projection2d.push(projectionLine)
+    }
+
+    camera.position.set(3, 2, 10);
+    camera.lookAt(0, 5, 0);
+
+    var upswing = true;
+    const upswing_points = [];
+    const downswing_points = [];
+    for (let i = 1; i < projection2d.length; i++) {
+      if (projection2d[i].y < projection2d[i-1].y) {
+        upswing = false;
+      }
+      if (upswing) {
+        upswing_points.push(new THREE.Vector3(projection2d[i].x, projection2d[i].y, projection2d[i].z));
+      }
+      else {
+        downswing_points.push(new THREE.Vector3(projection2d[i].x, projection2d[i].y, projection2d[i].z));
+      }
+    }
+    console.log(upswing_points);
+    console.log("SPLIT");
+    console.log(downswing_points)
+
+    const upswing_curve = new THREE.QuadraticBezierCurve3(
+      upswing_points[0],
+      upswing_points[upswing_points.length / 2],
+      upswing_points[upswing_points.length - 1]
+    );
+
+    const downswing_curve = new THREE.QuadraticBezierCurve3(
+      downswing_points[0],
+      downswing_points[downswing_points.length / 2],
+      downswing_points[downswing_points.length - 1]
+    );
+
+    const upswing_parabola_points = upswing_curve.getPoints(50);
+    const downswing_parabola_points = downswing_curve.getPoints(50);
 
     // Create a geometry object from the points
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const geometry = new THREE.BufferGeometry().setFromPoints(upswing_parabola_points);
+    const down_geo = new THREE.BufferGeometry().setFromPoints(downswing_parabola_points);
 
     // Create a material for the line
     const material = new THREE.LineBasicMaterial({ color: 0xffffff });
 
     // Create the line object and add it to the scene
-    const line = new THREE.Line(geometry, material);
-    scene.add(line);
+    const upline = new THREE.Line(geometry, material);
+    const downline = new THREE.Line(down_geo, material);
+
+    scene.add(upline);
+    scene.add(downline)
 
     // Render the scene
     const render = () => {
