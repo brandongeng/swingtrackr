@@ -343,41 +343,6 @@ function FeedbackScreen({ route, navigation }) {
     setPdata(posData);
   }, [swingData]);
 
-  // const onContextCreate = async (gl) => {
-  //   console.log(gl)
-  //   const scene = new THREE.Scene();
-  //   console.log(scene)
-  //   const camera = new PerspectiveCamera(
-  //     75,
-  //     gl.drawingBufferWidth/gl.drawingBufferHeight,
-  //     0.1,
-  //     1000
-  //   )
-
-  //   gl.canvas = { width: gl.drawingBufferWidth, height: gl.drawingBufferHeight }
-  //   camera.position.z = 2
-
-  //   const renderer = new Renderer({gl})
-  //   renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight)
-
-  //   const geometry = new BoxGeometry(1, 1, 1)
-  //   const material = new MeshBasicMaterial({
-  //     color: 'blue'
-  //   })
-
-  //   const cube = new Mesh(geometry, material)
-  //   scene.add(cube)
-
-  //   const render = ()=> {
-  //     requestAnimationFrame(render)
-  //     cube.rotation.x += 0.01
-  //     cube.rotation.y += 0.01
-  //     renderer.render(scene, camera)
-  //     gl.endFrameEXP()
-  //   }
-
-  //   render()
-  // };
   const onContextCreateAsync = (gl) => {
     console.log(gl)
     // Create a WebGLRenderer without a DOM element
@@ -462,9 +427,9 @@ function FeedbackScreen({ route, navigation }) {
         downswing_points.push(new THREE.Vector3(projection2d[i].x, projection2d[i].y, projection2d[i].z));
       }
     }
-    console.log(upswing_points);
-    console.log("SPLIT");
-    console.log(downswing_points)
+    // console.log(upswing_points);
+    // console.log("SPLIT");
+    // console.log(downswing_points)
 
     const upswing_curve = new THREE.QuadraticBezierCurve3(
       upswing_points[0],
@@ -506,14 +471,14 @@ function FeedbackScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* <View
+      <View
         style={{
           flexDirection: "row",
           width: "100%",
           height: "80%",
           alignItems: "center",
           justifyContent: "center",
-          display: showGraph ? "none" : "flex",
+          display: showGraph ? "flex" : "none",
         }}
       >
         <View style={styles.column}>
@@ -640,16 +605,18 @@ function FeedbackScreen({ route, navigation }) {
             </Text>
           </View>
         </View>
-      </View> */}
+      </View>
       <View
         style={{
           height: "80%",
           width: "100%",
+          display: showGraph ? "none" : "flex",
         }}
       >
         <GLView
           style={{
             flex: 1,
+            display: showGraph ? "none" : "flex",
           }}
           onContextCreate={onContextCreateAsync}
         />
@@ -670,7 +637,7 @@ function FeedbackScreen({ route, navigation }) {
         }}
       >
         <Text style={{ color: "white", fontSize: 24 }}>
-          {showGraph ? "Show Results" : "Show Graph"}
+          {showGraph ? "Show Graph" : "Show Results"}
         </Text>
       </TouchableOpacity>
       <Navbar navigation={navigation}></Navbar>
