@@ -460,6 +460,18 @@ function FeedbackScreen({ route, navigation }) {
     scene.add(upline);
     scene.add(downline)
 
+//ball flight to go in graph 
+    const flightData=[];
+    var fpx=0;
+    var fpy=0;
+    var fpz=0;
+    for (let i = 0; i < 100; i++){
+      fpx=-5+(Math.abs(50-i)*.1);
+      fpy=1.5*i;
+      fpz=(-.005)*(i-75)*(i-75)+28.125;
+      flightData[(fpx, fpy, fpz)]
+    }
+    
     // Render the scene
     const render = () => {
       renderer.render(scene, camera);
