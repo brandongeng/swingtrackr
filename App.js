@@ -343,11 +343,28 @@ function FeedbackScreen({ route, navigation }) {
 			posData[i][1] = (posData[i][1] - min) / (max - min);
 			posData[i][2] = (posData[i][2] - min) / (max - min);
 		}
-		setPdata(posData);
+
+    //ball flight to go in graph
+		const flightData = [];
+		var fpx = 0;
+		var fpy = 0;
+		var fpz = 0;
+		for (let i = 0; i < 150; i++) {
+			fpx = (1.5 * i);
+      fpy = (-0.005 * (i - 75) * (i - 75) + 28.125);
+      fpz = (-5 + Math.abs(50 - i) * 0.1);
+      //fpx = (-5 + Math.abs(50 - i) * 0.1) / 10;
+			// fpy = (1.5 * i) / 50;
+			// fpz = (-0.005 * (i - 75) * (i - 75) + 28.125) / 10;
+			flightData.push([fpx, fpy, fpz]);
+		}
+
+		setPdata(flightData);
 	}, [swingData]);
 
 	const onContextCreateAsync = (gl) => {
-		console.log(gl);
+    console.log(gl);
+
 		// Create a WebGLRenderer without a DOM element
 		const renderer = new Renderer({ gl });
 		renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -356,7 +373,7 @@ function FeedbackScreen({ route, navigation }) {
 
 		const scene = new THREE.Scene();
 		scene.fog = new THREE.Fog(sceneColor, 1, 10000);
-		scene.add(new THREE.GridHelper(10, 10, 0xfff));
+		scene.add(new THREE.GridHelper(100, 100, 0x343a40));
 
 		// Define the points of the line
 		const points = [];
@@ -383,7 +400,7 @@ function FeedbackScreen({ route, navigation }) {
 			);
 		}
 		x_range = x_max - x_min;
-		y_range = y_max - y_min;
+		y_range = (y_max - y_min) * y_max;
 		z_range = z_max - z_min;
 
 		for (let i = 0; i < points.length; i++) {
@@ -400,101 +417,103 @@ function FeedbackScreen({ route, navigation }) {
 			1000
 		);
 
-		// Create a 2D plane
-		const plane2d = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+		// // Create a 2D plane
+		// const plane2d = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
 
-		// Project the line onto the plane
-		const projection2d = [];
-		//const scaleFactorY = 2 / y_max
-		const scaleFactorZ = 5 / z_max;
-		for (let i = 0; i < points.length; i++) {
-			const projection = new THREE.Vector3();
-			plane2d.projectPoint(points[i], projection);
-			// The projection is a 3D point, so we need to convert it to 2D
-			const projectionLine = new THREE.Vector3(
-				0,
-				projection.y,
-				projection.z * scaleFactorZ
-			);
-			projection2d.push(projectionLine);
-		}
+		// // Project the line onto the plane
+		// const projection2d = [];
+		// //const scaleFactorY = 2 / y_max
+		// const scaleFactorZ = 5 / z_max;
+		// for (let i = 0; i < points.length; i++) {
+		// 	const projection = new THREE.Vector3();
+		// 	plane2d.projectPoint(points[i], projection);
+		// 	// The projection is a 3D point, so we need to convert it to 2D
+		// 	const projectionLine = new THREE.Vector3(
+		// 		0,
+		// 		projection.y,
+		// 		projection.z * scaleFactorZ
+		// 	);
+		// 	projection2d.push(projectionLine);
+		// }
 
-		camera.position.set(3, 2, 10);
-		camera.lookAt(0, 5, 0);
+		//camera.position.set(3, 2, 10);
+    camera.position.set(-1, 0.5, 0);
+		camera.lookAt(1, 0.5, 0);
 
-		var upswing = true;
-		const upswing_points = [];
-		const downswing_points = [];
-		for (let i = 1; i < projection2d.length; i++) {
-			if (projection2d[i].y < projection2d[i - 1].y) {
-				upswing = false;
-			}
-			if (upswing) {
-				upswing_points.push(
-					new THREE.Vector3(
-						projection2d[i].x,
-						projection2d[i].y,
-						projection2d[i].z
-					)
-				);
-			} else {
-				downswing_points.push(
-					new THREE.Vector3(
-						projection2d[i].x,
-						projection2d[i].y,
-						projection2d[i].z
-					)
-				);
-			}
-		}
+		// var upswing = true;
+		// const upswing_points = [];
+		// const downswing_points = [];
+		// for (let i = 1; i < projection2d.length; i++) {
+		// 	if (projection2d[i].y < projection2d[i - 1].y) {
+		// 		upswing = false;
+		// 	}
+		// 	if (upswing) {
+		// 		upswing_points.push(
+		// 			new THREE.Vector3(
+		// 				projection2d[i].x,
+		// 				projection2d[i].y,
+		// 				projection2d[i].z
+		// 			)
+		// 		);
+		// 	} else {
+		// 		downswing_points.push(
+		// 			new THREE.Vector3(
+		// 				projection2d[i].x,
+		// 				projection2d[i].y,
+		// 				projection2d[i].z
+		// 			)
+		// 		);
+		// 	}
+		// }
 		// console.log(upswing_points);
 		// console.log("SPLIT");
 		// console.log(downswing_points)
 
-		const upswing_curve = new THREE.QuadraticBezierCurve3(
-			upswing_points[0],
-			upswing_points[upswing_points.length / 2],
-			upswing_points[upswing_points.length - 1]
+		// const upswing_curve = new THREE.QuadraticBezierCurve3(
+		// 	upswing_points[0],
+		// 	upswing_points[upswing_points.length / 2],
+		// 	upswing_points[upswing_points.length - 1]
+		// );
+
+		// const downswing_curve = new THREE.QuadraticBezierCurve3(
+		// 	downswing_points[0],
+		// 	downswing_points[downswing_points.length / 2],
+		// 	downswing_points[downswing_points.length - 1]
+		// );
+
+		// const upswing_parabola_points = upswing_curve.getPoints(50);
+		// const downswing_parabola_points = downswing_curve.getPoints(50);
+
+		// // Create a geometry object from the points
+		// const geometry = new THREE.BufferGeometry().setFromPoints(
+		// 	upswing_parabola_points
+		// );
+		// const down_geo = new THREE.BufferGeometry().setFromPoints(
+		// 	downswing_parabola_points
+		// );
+
+    // Create a curve from the points
+    const swing_curve = new THREE.QuadraticBezierCurve3(
+			points[0],
+			points[points.length / 2],
+			points[points.length - 1]
 		);
 
-		const downswing_curve = new THREE.QuadraticBezierCurve3(
-			downswing_points[0],
-			downswing_points[downswing_points.length / 2],
-			downswing_points[downswing_points.length - 1]
-		);
+    const swing_points = swing_curve.getPoints(100);
 
-		const upswing_parabola_points = upswing_curve.getPoints(50);
-		const downswing_parabola_points = downswing_curve.getPoints(50);
-
-		// Create a geometry object from the points
-		const geometry = new THREE.BufferGeometry().setFromPoints(
-			upswing_parabola_points
-		);
-		const down_geo = new THREE.BufferGeometry().setFromPoints(
-			downswing_parabola_points
+    const geometry = new THREE.BufferGeometry().setFromPoints(
+			swing_points
 		);
 
 		// Create a material for the line
-		const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+		const material = new THREE.LineBasicMaterial({ color: 0x8ce99a });
 
 		// Create the line object and add it to the scene
 		const upline = new THREE.Line(geometry, material);
-		const downline = new THREE.Line(down_geo, material);
+		//const downline = new THREE.Line(down_geo, material);
 
 		scene.add(upline);
-		scene.add(downline);
-
-		//ball flight to go in graph
-		const flightData = [];
-		var fpx = 0;
-		var fpy = 0;
-		var fpz = 0;
-		for (let i = 0; i < 100; i++) {
-			fpx = -5 + Math.abs(50 - i) * 0.1;
-			fpy = 1.5 * i;
-			fpz = -0.005 * (i - 75) * (i - 75) + 28.125;
-			flightData.push([fpx, fpy, fpz]);
-		}
+		//scene.add(downline);
 
 		// Render the scene
 		const render = () => {
