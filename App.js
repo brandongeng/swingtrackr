@@ -493,7 +493,7 @@ function FeedbackScreen({ route, navigation }) {
 			fpx = -5 + Math.abs(50 - i) * 0.1;
 			fpy = 1.5 * i;
 			fpz = -0.005 * (i - 75) * (i - 75) + 28.125;
-			flightData[(fpx, fpy, fpz)];
+			flightData.push([fpx, fpy, fpz]);
 		}
 
 		// Render the scene
