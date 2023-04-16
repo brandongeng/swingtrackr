@@ -307,8 +307,8 @@ function FeedbackScreen({ route, navigation }) {
 		temp[3] = Math.floor(Math.random() * 40);
 		temp[4] = Math.floor(Math.random() * 3) - 5;
 		temp[5] = Math.floor(Math.random() * 5) + 14;
-		temp[6] = Math.floor(Math.random() * 30) + 60;
-		temp[7] = 1.5 * temp[6];
+		temp[7] = Math.floor(Math.random() * 30) + 60;
+    		temp[6] = 1.5*temp[7];
 		setFeedbackData(temp);
 	}, []);
 
